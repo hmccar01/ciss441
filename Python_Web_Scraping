@@ -1,0 +1,27 @@
+from bs4 import BeautifulSoup
+import requests
+
+
+# downloading and saving to disk
+fname, purl = 'wi_bre_tn','https://en.wikipedia.org/wiki/Brentwood,_Tennessee'
+res = requests.get(purl)
+webcontent = res.text
+with open(fname + '.txt', encoding='utf-8', mode='w') as fo:
+	fo.write(webcontent)
+		
+soup = BeautifulSoup(webcontent, "html.parser")
+print('\n\n', purl, res.status_code)
+	
+ptitle = soup.title
+if ptitle:
+	print(ptitle.string)
+		
+# print all hyperlinks
+for lnkct, link in enumerate(soup.find_all('a')):
+	lnk = link.get('href')
+	if lnk and lnkct < 3:
+		print('  ' + lnk)
+			
+# extract all text
+with open(fname + '_justtext.txt', encoding='utf-8', mode='w') as fo:
+		fo.write(soup.get_text())
