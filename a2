@@ -1,0 +1,62 @@
+import csv				#imports comma seperated value
+import sqlite3			#imports sqlite3
+
+with open("flavors_of_cacao.csv") as flavors_of_cacao:
+	readCSV = csv.DictReader(flavors_of_cacao, delimiter=',')	#indicates that it is comma delimited, creates ReadCSV
+	
+	#readCSV = list(readCSV)
+	
+	row_count = 0	#creates a variable for a loop that will display 10 entries
+	
+	c_data = []		
+	
+	for cacao_row_dict in readCSV:			#this adds definition to readCSV
+		row_count += 1
+		c_company = cacao_row_dict['Company']
+		c_origin = cacao_row_dict['Specific Bean Origin']
+		c_REF = cacao_row_dict['REF']
+		c_date = cacao_row_dict['Review Date']
+		c_percent = cacao_row_dict['Cocoa Percent']
+		c_location = cacao_row_dict['Company Location']
+		c_rating = cacao_row_dict['Rating']
+		c_beantype = cacao_row_dict['Bean Type']
+		c_origin = cacao_row_dict['Broad Bean Origin']
+		
+		if (row_count < 11):		#this stops after 10 results due to a loop
+			c_data.append(cacao_row_dict)
+			print(row_count, c_company, c_origin, c_REF, c_date, c_percent, c_location, c_rating, c_beantype, c_origin)
+
+	
+	
+
+con = sqlite3.connect("flavors_of_cacao.db")  #this will be used to create the table for the database
+cur = con.cursor()
+cur.execute("""CREATE TABLE Cacao_Ranks (
+			"company",
+			"specific_bean_origin",
+			"ref",
+			"review_date",
+			"cocao_percent",
+			"company_location",
+			"rating",
+			"bean_type",
+			"broad_bean_origin");
+""")
+
+for row in c_data: 							#This will insert the data into the created table
+	cur.execute("""INSERT INTO Cacao_Ranks (
+				"company",
+				"specific_bean_origin",
+				"ref",
+				"review_date",
+				"cocao_percent",
+				"company_location",
+				"rating",
+				"bean_type",
+				"broad_bean_origin")
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+	""", [row["Company"], row["Specific Bean Origin"], row["REF"], row["Review Date"],  row["Cocoa Percent"], row["Company Location"], row["Rating"], row["Bean Type"], row["Broad Bean Origin"]])
+
+con.commit()
+con.close()
+
